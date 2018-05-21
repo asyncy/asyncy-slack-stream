@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/asyncy/asyncy-slack-stream#readme",
   "dependencies": {
-    "@slack/client": "^4.2.2"
+    "@slack/client": "^4.2.2",
+    "express": "^4.16.3"
   }
 }

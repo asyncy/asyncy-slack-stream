@@ -1,27 +1,39 @@
+const express = require('express');
 const { RTMClient } = require('@slack/client');
 
 const token = process.env.SLACK_TOKEN;
 
+const app = express();
+app.set('port', (process.env.PORT || 5000));
+
 const rtm = new RTMClient(token);
 rtm.start();
 
-const conversationId = '#genral'; // can get this via http
-
-rtm.sendMessage('Hello there', conversationId)
-  .then((res) => {
-    console.log('Message sent: ', res.ts);
-  })
-  .catch(console.error);
+app.post('/send', (req, res) => {
+  if (!req.query || !req.query.messasge || !req.query.coversation_id) {
+    const error_message = {error: 'must provide message and conversation_id via query parameters'};
+    process.stderr.write(error_message);
+    res.status(400).send(error_message);
+  } else {
+    rtm.sendMessage(req.query.message, req.query.conversation_id)
+      .then((data) => {
+        res.send('Message sent: ' + data.ts);
+      })
+      .catch((err) => {
+        process.stderr.write(err);
+        res.status(500).send(err)
+      });
+  }
+});
 
 rtm.on('message', (event) => {
-  const message = event;
-  console.log(event);
-
   // Skip messages that are from a bot or my own user ID
-  if ( (message.subtype && message.subtype === 'bot_message') ||
-    (!message.subtype && message.user === rtm.activeUserId) ) {
+  if ((event.subtype && event.subtype === 'bot_message') || (!event.subtype && event.user === rtm.activeUserId)) {
     return;
   }
-
-  console.log(`(channel:${message.channel}) ${message.user} says: ${message.text}`);
+  process.stdout.write(JSON.stringify(event))
 });
+
+app.listen(app.get('port'));
+
+process.stdout.write(`Listening on port ${app.get('port')}`);

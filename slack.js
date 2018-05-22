@@ -21,7 +21,7 @@ app.post('/send', (req, res) => {
       })
       .catch((err) => {
         process.stderr.write(err);
-        res.status(500).send(err)
+        res.status(500).send(err);
       });
   }
 });

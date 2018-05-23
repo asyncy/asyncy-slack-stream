@@ -18,6 +18,7 @@
   "homepage": "https://github.com/asyncy/asyncy-slack-stream#readme",
   "dependencies": {
     "@slack/client": "^4.2.2",
+    "body-parser": "^1.18.3",
     "express": "^4.16.3"
   }
 }

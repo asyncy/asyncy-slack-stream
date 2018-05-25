@@ -1,0 +1,17 @@
+server:
+  type: http
+  port: 5000
+
+commands:
+  send:
+    arguments:
+      - name: data
+        type: string
+      - name: channel
+        type: string
+    http:
+      method: post
+      endpoint: /send
+
+  run:
+    command: ["node", "slackReceive.js"]

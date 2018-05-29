@@ -1,13 +1,13 @@
-server:
-  type: http
-  port: 5000
+lifecycle:
+  startup:
+    port: 5000
 
 commands:
   send:
     arguments:
-      - name: data
+      data:
         type: string
-      - name: channel
+      channel:
         type: string
     http:
       method: post

@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const { RTMClient } = require('@slack/client');
 
 const app = express();
-app.set('port', 5000);
+app.set('port', parseInt(process.env.PORT || 5000));
 app.use(bodyParser.json());
 
 const rtm = new RTMClient(process.env.BOT_TOKEN);

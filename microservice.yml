@@ -15,3 +15,8 @@ commands:
 
   run:
     command: ["node", "slackReceive.js"]
+
+environment:
+  bot_token:
+    type: string
+    help: The Slack Bot token

@@ -11,10 +11,10 @@ rtm.start();
 
 app.post('/send', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  if (!req.body || !req.body.message || !req.body.conversation_id) {
-    res.status(400).send({error: 'must provide message and conversation_id via body'});
+  if (!req.body || !req.body.message || !req.body.to) {
+    res.status(400).send({error: 'must provide message and to via body'});
   } else {
-    rtm.sendMessage(req.body.message, req.body.conversation_id)
+    rtm.sendMessage(req.body.message, req.body.to)
       .then((data) => {
         res.send(data);
       })

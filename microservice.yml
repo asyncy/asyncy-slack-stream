@@ -1,13 +1,14 @@
 lifecycle:
   startup:
     port: 5000
+    command: ["node", "slackSend.js"]
 
 commands:
   send:
     arguments:
-      data:
+      message:
         type: string
-      channel:
+      to:
         type: string
     http:
       method: post
@@ -19,4 +20,4 @@ commands:
 environment:
   bot_token:
     type: string
-    help: The Slack Bot token
+    help: The Slack bot token

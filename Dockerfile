@@ -1,8 +1,7 @@
 FROM node:9.7-alpine
 
-RUN npm i
-ADD slackSend.js slackSend.js
-ADD slackReceive.js slackReceive.js
-ADD node_modules/ node_modules/
+RUN npm install @slack/client request
 
-ENTRYPOINT ["node", "slackSend.js"]
+ADD app.js app.js
+
+ENTRYPOINT ["node", "app.js"]

@@ -1,6 +1,6 @@
 {
-  "name": "asyncy-slack-stream",
-  "version": "1.0.0",
+  "name": "omg-slack",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,17 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/asyncy/asyncy-slack-stream.git"
+    "url": "git+https://github.com/microservice/slack.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/asyncy/asyncy-slack-stream/issues"
+    "url": "https://github.com/microservice/slack/issues"
   },
-  "homepage": "https://github.com/asyncy/asyncy-slack-stream#readme",
+  "homepage": "https://github.com/microservice/slack#readme",
   "dependencies": {
-    "@slack/client": "^4.2.2",
-    "body-parser": "^1.18.3",
-    "express": "^4.16.3"
+    "@slack/client": "^4.3.1",
+    "request": "^2.87.0"
   }
 }

@@ -1,23 +1,60 @@
-lifecycle:
-  startup:
-    port: 5000
-    command: ["node", "slackSend.js"]
+_output: &output
+  type: object
+  commands:
+    reply:
+      help: Reply to the message
+      arguments:
+        text:
+          type: string
+          required: true
+          help: Text of the message to send.
+        channel:
+          type: string
+          required: true
+          help: Channel, private group, or IM channel to send message to.
+        thread_ts:
+          type: string
+          help: Provide another message's `ts` value to make this message a reply. Avoid using a reply's `ts` value; use its parent instead.
+      http:
+        method: post
+        path: /send
 
 commands:
-  send:
-    arguments:
-      message:
-        type: string
-      to:
-        type: string
-    http:
-      method: post
-      endpoint: /send
+  bot:
+    help: Start a Slack bot
+    run:
+      command: ["node", "app.js"]
+      port: 5000
+    events:
+      hears:
+        help: Triggered anytime a messages matches the pattern
+        arguments:
+          pattern:
+            type: string
+            help: A regexp pattern to filter messages
+          channel:
+            type: string
+            help: Only listen in a specific channel
+        http:
+          method: post
+          path: /subscribe/hears
+      	output:
+          <<: *output
 
-  run:
-    command: ["node", "slackReceive.js"]
+      responds:
+        help: Triggered by direct messages to the bot
+        http:
+          method: post
+          path: /subscribe/responds
+        arguments:
+          pattern:
+            type: string
+            help: A regexp pattern to filter messages
+        output:
+          <<: *output
 
 environment:
-  bot_token:
-    type: string
+  name:
+    help: The name of the bot
+  token:
     help: The Slack bot token

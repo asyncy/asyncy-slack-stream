@@ -1,26 +1,37 @@
-# Slack Bot Microservice
+# Slack as a microservice
 
-[![Microservice.Guide](https://img.shields.io/badge/Microservice.Guide-ready-brightgreen.svg?style=for-the-badge)](https://microservice.guide)
+[![Open Microservice Guide](https://img.shields.io/badge/OMG-enabled-brightgreen.svg?style=for-the-badge)](https://microservice.guide)
 
-[TODO] add descriptions/features here
+This microservice's goal is to fully utilise the Slack API.
 
-See all message data here: https://api.slack.com/events/message
+## [OMG](hhttps://microservice.guide) CLI
 
-## Asyncy Example
+### Slack Bot
+```sh
+omg exec -e TOKEN=<secret> -c bot
+```
 
-The `slack` service is published in the Asyncy Hub
+Subscribe to an event.
+```sh
+omg subscribe -e hears -a "pattern=/^hello/"
+```
+
+
+## [Asyncy](https://asyncy.com) Example
+
+The `slack` service is published in the [Asyncy Hub](https://hub.asyncy.com/r/microservice/slack)
 
 ```storyscript
-slack bot as bot
-    when bot.hears channel:'general' pattern:/^welcome/ as event
-        event emoji key:'thumbs_up'
-        event reply message:'Nice to have you here'
+slack bot as client
+    when client hears channel:'general' pattern:/^welcome/ as msg
+        msg emoji key:'thumbs_up'
+        msg reply message:'Nice to have you here'
 
-    when bot.responds pattern:/foo/ as event
+    when client responds pattern:/foo/ as msg
         # respond to direct messages
-        event reply message:'bar'
+        msg reply message:'bar'
 
-    when bot.slash pattern:/deploy/ as event
+    when client slash pattern:/deploy/ as msg
         # when user does /deploy do something awesome
 
 ```

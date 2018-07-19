@@ -28,20 +28,24 @@ rtm.on('message', (message) => {
   var direct = new RegExp(`^<@${rtm.activeUserId}>`);
 
   // loop through all our listeners
-  Object.keys(Listeners).forEach((endpoint) => {
-    var listener = Listeners[endpoint];
+  Object.keys(Listeners).forEach((id) => {
+    var listener = Listeners[id];
+    var isDirect = (message.text.match(direct) !== null);
     if (
-      (listener.direct == (message.text.match(direct) !== null)) &&
+      (listener.direct === isDirect) &&
       (!listener.channel || listener.channel === message.channel) &&
       (!listener.filter || message.text.match(listener.filter) !== null)
     ){
       // [TODO] add metric for receiving this event
-      // [TODO] add log saying what message was heard
-      console.log('Will post to ' + endpoint);
+      console.log('Publishing to '+listener.id);
       request.post({
         headers: {'Content-Type': 'application/json'},
-        url: endpoint,
-        body: message
+        url: listener.endpoint || process.env.OMG_ENDPOINT,
+        body: JSON.stringify({
+          id: listener.id,
+          event: ((isDirect) ? 'responds' : 'hears'),
+          data: message,
+        })
       });
     }
   });
@@ -53,33 +57,34 @@ http.createServer((req, res) => {
   req.on('data', chunk => { body += chunk.toString(); });
   req.on('end', () => {
     var data = JSON.parse(body);
-    if (req.url == '/subscribe/responds' || req.url == '/subscribe/hears') {
+    if (req.url == '/subscribe') {
       // [TODO] log new listener
-      console.log('New subscribe')
+      console.log('New subscribe '+body);
 
-      Listeners[data.endpoint] = {
-          direct: (req.url == '/subscribe/responds'),
-          channel: data.channel,
-          pattern: (data.pattern ? new RegExp(data.pattern) : null),
+      Listeners[data.id] = {
+          direct: (data.event === 'responds'),
+          endpoint: data.endpoint,
+          channel: data.data.channel,
+          pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
       };
-      res.writeHead(200, {'Content-type':'text/plan'});
-      res.end('subscribed');
+      res.writeHead(204, {'Content-type':'text/plan'});
+      res.end();
 
     } else if (req.url == '/unsubscribe') {
       // [TODO] log new listener
       console.log('New unsubscribe')
 
-      delete Listeners[data.endpoint];
-      res.writeHead(200, {'Content-type':'text/plan'});
-      res.end('unsubscribed');
+      delete Listeners[data.id];
+      res.writeHead(204, {'Content-type':'text/plan'});
+      res.end();
 
     } else if (req.url == '/send') {
       // Send a message
       web.chat.postMessage(data)
         .then((res) => {
           console.log('Message sent: ', res.ts);
-          res.writeHead(200, {'Content-type':'text/plan'});
-          res.end('Sent');
+          res.writeHead(204, {'Content-type':'text/plan'});
+          res.end();
         })
         .catch((err) => {
           console.error(err);

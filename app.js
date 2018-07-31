@@ -42,8 +42,10 @@ rtm.on('message', (message) => {
         headers: {'Content-Type': 'application/json'},
         url: listener.endpoint || process.env.OMG_ENDPOINT,
         body: JSON.stringify({
-          id: listener.id,
-          event: ((isDirect) ? 'responds' : 'hears'),
+          eventType: ((isDirect) ? 'responds' : 'hears'),
+          cloudEventsVersion: '0.1',
+          contentType: 'application/json',
+          eventID: message.ts,
           data: message,
         })
       });

@@ -16,8 +16,9 @@ commands:
             help: Only listen in a specific channel
         http:
           port: 5000
-          method: post
-          path: /subscribe
+          subscribe:
+            path: /subscribe
+            method: post
         output: &output
           type: object
           commands:

@@ -1,9 +1,9 @@
+lifecycle:
+  startup:
+    command: ["node", "app.js"]
 commands:
   bot:
     help: Start a Slack bot
-    run:
-      command: ["node", "app.js"]
-      port: 5000
     events:
       hears:
         help: Triggered anytime a messages matches the pattern
@@ -15,6 +15,7 @@ commands:
             type: string
             help: Only listen in a specific channel
         http:
+          port: 5000
           method: post
           path: /subscribe
         output: &output
@@ -35,12 +36,14 @@ commands:
                   type: string
                   help: Provide another message's `ts` value to make this message a reply. Avoid using a reply's `ts` value; use its parent instead.
               http:
+                port: 5000
                 method: post
                 path: /send
 
       responds:
         help: Triggered by direct messages to the bot
         http:
+          port: 5000
           method: post
           path: /subscribe
         arguments:

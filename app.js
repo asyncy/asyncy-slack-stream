@@ -39,21 +39,19 @@ rtm.on('message', (message) => {
       // [TODO] add metric for receiving this event
       const url = listener.endpoint || process.env.OMG_ENDPOINT;
       console.log('Publishing to ' + listener.id + ' @ ' + url);
-      try {
-        request.post({
-          headers: {'Content-Type': 'application/json'},
-          url: url,
-          body: JSON.stringify({
-            eventType: ((isDirect) ? 'responds' : 'hears'),
-            cloudEventsVersion: '0.1',
-            contentType: 'application/json',
-            eventID: message.ts,
-            data: message,
-          })
-        });
-      } catch (e) {
-        console.error("Failed to publish event to listener!", e);
-      }
+      request.post({
+        headers: {'Content-Type': 'application/json'},
+        url: url,
+        body: JSON.stringify({
+          eventType: ((isDirect) ? 'responds' : 'hears'),
+          cloudEventsVersion: '0.1',
+          contentType: 'application/json',
+          eventID: message.ts,
+          data: message,
+        })
+      }, function(err) {
+        console.error("Failed to publish event!", err);
+      });
     }
   });
 });

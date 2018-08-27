@@ -10,17 +10,31 @@ commands:
         arguments:
           pattern:
             type: string
+            in: requestBody
             help: A regexp pattern to filter messages
           channel:
             type: string
+            in: requestBody
             help: Only listen in a specific channel
         http:
           port: 5000
           subscribe:
             path: /subscribe
             method: post
+            requestBody: application/json
         output: &output
+          contentType: application/json
           type: object
+          attributes:
+            text:
+              help: The message text
+              type: string
+            id:
+              help: The message ID
+              type: string
+            ts:
+              help: The thread TS
+              type: string
           commands:
             reply:
               help: Reply to the message
@@ -37,6 +51,7 @@ commands:
                   type: string
                   help: Provide another message's `ts` value to make this message a reply. Avoid using a reply's `ts` value; use its parent instead.
               http:
+                requestBody: application/json
                 port: 5000
                 method: post
                 path: /send
@@ -44,12 +59,14 @@ commands:
       responds:
         help: Triggered by direct messages to the bot
         http:
+          requestBody: application/json
           port: 5000
           method: post
           path: /subscribe
         arguments:
           pattern:
             type: string
+            in: requestBody
             help: A regexp pattern to filter messages
         output:
           <<: *output

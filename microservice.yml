@@ -10,33 +10,60 @@ commands:
         arguments:
           pattern:
             type: string
+            in: requestBody
             help: A regexp pattern to filter messages
           channel:
             type: string
+            in: requestBody
             help: Only listen in a specific channel
         http:
           port: 5000
           subscribe:
             path: /subscribe
             method: post
+            contentType: application/json
+          unsubscribe:
+            path: /unsubscribe
+            method: delete
         output: &output
+          contentType: application/json
           type: object
+          properties:
+            text:
+              help: The message text
+              type: string
+            client_msg_id:
+              help: The message ID
+              type: string
+            channel:
+              help: The channel ID
+              type: string
+            user:
+              help: The user ID
+              type: string
+            ts:
+              help: The message timestamp (eg: "1535474523.000100")
+              type: string
           commands:
             reply:
               help: Reply to the message
               arguments:
                 text:
                   type: string
+                  in: query
                   required: true
                   help: Text of the message to send.
                 channel:
                   type: string
+                  in: requestBody
                   required: true
                   help: Channel, private group, or IM channel to send message to.
                 thread_ts:
                   type: string
+                  in: requestBody
                   help: Provide another message's `ts` value to make this message a reply. Avoid using a reply's `ts` value; use its parent instead.
               http:
+                contentType: application/json
                 port: 5000
                 method: post
                 path: /send
@@ -44,15 +71,36 @@ commands:
       responds:
         help: Triggered by direct messages to the bot
         http:
+          contentType: application/json
           port: 5000
           method: post
           path: /subscribe
         arguments:
           pattern:
             type: string
+            in: requestBody
             help: A regexp pattern to filter messages
         output:
           <<: *output
+
+  list_channels:
+    help: Get a list of channels
+    http:
+      port: 5000
+      method: get
+      path: /channels
+    output:
+      contentType: application/json
+      type: list
+      items:
+        type: object
+        properties:
+          id:
+            help: The channel ID
+            type: string
+          name:
+            help: The channel name
+            type: string
 
 environment:
   name:

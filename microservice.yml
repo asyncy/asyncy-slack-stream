@@ -32,11 +32,17 @@ commands:
             text:
               help: The message text
               type: string
-            id:
+            client_msg_id:
               help: The message ID
               type: string
+            channel:
+              help: The channel ID
+              type: string
+            user:
+              help: The user ID
+              type: string
             ts:
-              help: The thread TS
+              help: The message timestamp (eg: "1535474523.000100")
               type: string
           commands:
             reply:

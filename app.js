@@ -39,16 +39,17 @@ rtm.on('message', (message) => {
       // [TODO] add metric for receiving this event
       const url = listener.endpoint || process.env.OMG_ENDPOINT;
       console.log('Publishing to ' + listener.id + ' @ ' + url);
+      let body = JSON.stringify({
+        eventType: ((isDirect) ? 'responds' : 'hears'),
+        cloudEventsVersion: '0.1',
+        contentType: 'application/vnd.omg.object+json',
+        eventID: message.client_msg_id,
+        data: message,
+      });
       request.post({
         headers: {'Content-Type': 'application/json'},
         url: url,
-        body: JSON.stringify({
-          eventType: ((isDirect) ? 'responds' : 'hears'),
-          cloudEventsVersion: '0.1',
-          contentType: 'application/json',
-          eventID: message.ts,
-          data: message,
-        })
+        body: body
       }, function(err) {
         console.error("Failed to publish event!", err);
       });
@@ -73,7 +74,7 @@ http.createServer((req, res) => {
           channel: data.data.channel,
           pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
       };
-      res.writeHead(204, {'Content-type':'text/plan'});
+      res.writeHead(204);
       res.end();
 
     } else if (req.url == '/unsubscribe') {
@@ -81,7 +82,7 @@ http.createServer((req, res) => {
       console.log('New unsubscribe');
 
       delete Listeners[data.id];
-      res.writeHead(204, {'Content-type':'text/plan'});
+      res.writeHead(204);
       res.end();
 
     } else if (req.url == '/send') {
@@ -89,12 +90,12 @@ http.createServer((req, res) => {
       web.chat.postMessage(data)
         .then((res) => {
           console.log('Message sent: ', res.ts);
-          res.writeHead(204, {'Content-type':'text/plan'});
+          res.writeHead(204);
           res.end();
         })
         .catch((err) => {
           console.error(err);
-          res.writeHead(500, {'Content-type':'text/plan'});
+          res.writeHead(500);
           res.end(err);
         });
 
@@ -102,7 +103,7 @@ http.createServer((req, res) => {
       // [TODO] log new listener
       console.error('Bad request');
 
-      res.writeHead(400, {'Content-type':'text/plan'});
+      res.writeHead(400);
       res.end('Bad request');
     }
   });

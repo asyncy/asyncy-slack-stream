@@ -40,7 +40,6 @@ commands:
               type: string
           commands:
             reply:
-              type: function|method
               help: Reply to the message
               arguments:
                 text:

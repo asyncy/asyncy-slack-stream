@@ -50,7 +50,7 @@ commands:
               arguments:
                 text:
                   type: string
-                  in: query
+                  in: requestBody
                   required: true
                   help: Text of the message to send.
                 channel:

@@ -50,8 +50,10 @@ rtm.on('message', (message) => {
         headers: {'Content-Type': 'application/json'},
         url: url,
         body: body
-      }, function(err) {
-        console.error("Failed to publish event!", err);
+      }, function(err, response, body) {
+        if (err) {
+          console.error("Failed to publish event!", err);
+        }
       });
     }
   });

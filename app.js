@@ -88,8 +88,8 @@ http.createServer((req, res) => {
     } else if (req.url == '/send') {
       // Send a message
       web.chat.postMessage(data)
-        .then((res) => {
-          console.log('Message sent: ', res.ts);
+        .then((r) => {
+          console.log('Message sent: ', r.ts);
           res.writeHead(204);
           res.end();
         })

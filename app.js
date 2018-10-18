@@ -109,6 +109,7 @@ http.createServer((req, res) => {
         limit: 100
       };
       web.conversations.list(param).then(results => {
+        res.setHeader('Content-Type', 'application/json');
         res.write(JSON.stringify(results.channels));
         res.end();
       });

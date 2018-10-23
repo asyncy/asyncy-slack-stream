@@ -64,7 +64,7 @@ http.createServer((req, res) => {
   let body = '';
   req.on('data', chunk => { body += chunk.toString(); });
   req.on('end', () => {
-    var data = JSON.parse(body);
+    var data = (body ? JSON.parse(body) : {})
     if (req.url == '/subscribe') {
       // [TODO] log new listener
       console.log('New subscribe '+body);
@@ -101,6 +101,18 @@ http.createServer((req, res) => {
           res.end(err);
         });
 
+    } else if (req.url == '/channels') {
+      const param = {
+        exclude_archived: true,
+        types: 'public_channel',
+        // Only get first 100 items
+        limit: 100
+      };
+      web.conversations.list(param).then(results => {
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify(results.channels));
+        res.end();
+      });
     } else {
       // [TODO] log new listener
       console.error('Bad request');

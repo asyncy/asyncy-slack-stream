@@ -68,17 +68,23 @@ http.createServer((req, res) => {
     if (req.url == '/subscribe') {
       // [TODO] log new listener
       console.log('New subscribe '+body);
-
-      Listeners[data.id] = {
-          id: data.id,
-          direct: (data.event === 'responds'),
-          endpoint: data.endpoint,
-          channel: data.data.channel,
-          pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
-      };
-      res.writeHead(204);
-      res.end();
-
+      web.channels.list().then((result) => {
+        let channel = result.ok && result.channels.find(c => c.name === data.data.channel)
+        if (channel) {
+          Listeners[data.id] = {
+            id: data.id,
+            direct: (data.event === 'responds'),
+            endpoint: data.endpoint,
+            channel: channel.id,
+            pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
+          };
+          res.writeHead(204);
+          res.end();
+        } else {
+          res.writeHead(404);
+          res.end();
+        }
+      })
     } else if (req.url == '/unsubscribe') {
       // [TODO] log new listener
       console.log('New unsubscribe');

@@ -1,8 +1,8 @@
-version: 1
+omg: 1
 lifecycle:
   startup:
     command: ["node", "app.js"]
-commands:
+actions:
   bot:
     help: Start a Slack bot
     events:
@@ -20,8 +20,8 @@ commands:
         http:
           port: 5000
           subscribe:
-            path: /subscribe
             method: post
+            path: /subscribe
             contentType: application/json
           unsubscribe:
             path: /unsubscribe
@@ -72,10 +72,11 @@ commands:
       responds:
         help: Triggered by direct messages to the bot
         http:
-          contentType: application/json
-          port: 5000
-          method: post
-          path: /subscribe
+          subscribe:
+            contentType: application/json
+            port: 5000
+            method: post
+            path: /subscribe
         arguments:
           pattern:
             type: string
@@ -104,7 +105,7 @@ commands:
             type: string
 
 environment:
-  name:
-    help: The name of the bot
-  token:
+  BOT_TOKEN:
+    required: true
+    type: string
     help: The Slack bot token

@@ -2,7 +2,82 @@ omg: 1
 lifecycle:
   startup:
     command: ["node", "app.js"]
+
 actions:
+  say:
+    help: |
+      Post a message in a channel or thread.
+      http://slackapi.github.io/node-slack-sdk/web_api#posting-a-message
+    arguments:
+      text:
+        type: string
+        in: requestBody
+        required: true
+        help: Text of the message to send.
+      to:
+        type: string
+        in: requestBody
+        help: What channel or thread to send message in.
+      attachments:
+        type: list
+        in: requestBody
+        # items:
+        #   type: map
+        #   attributes:
+        #     fallback:
+        #       help: Required plain-text summary of the attachment.
+        #       type: string
+        #     color:
+        #       type: string
+        #       pattern: '^#\\w{6}'
+        #     author_name:
+        #       type: string
+        #     author_link:
+        #       type: string
+        #       pattern: '^http'
+        #     author_icon:
+        #       type: string
+        #       pattern: '^http'
+        #     title:
+        #       type: string
+        #     title_link:
+        #       type: string
+        #       pattern: '^http'
+        #     text:
+        #       type: string
+        #       help: Optional text that appears within the attachment
+        #     fields:
+        #       type: list
+        #       items:
+        #         type: map
+        #         properties:
+        #           title:
+        #             type: string
+        #           value:
+        #             type: string
+        #           short:
+        #             type: boolean
+        #     image_url:
+        #       type: string
+        #       pattern: '^http'
+        #     thumb_url:
+        #       type: string
+        #       pattern: '^http'
+        #     footer:
+        #       type: string
+        #     footer_icon:
+        #       type: string
+        #       pattern: '^http'
+        #     ts:
+        #       type: int
+    output:
+      type: map
+    http:
+      contentType: application/json
+      port: 5000
+      method: post
+      path: /send
+
   bot:
     help: Start a Slack bot
     events:
@@ -16,6 +91,7 @@ actions:
           channel:
             type: string
             in: requestBody
+            required: true
             help: Only listen in a specific channel
         http:
           port: 5000
@@ -45,7 +121,7 @@ actions:
             ts:
               help: The message timestamp (eg: "1535474523.000100")
               type: string
-          commands:
+          actions:
             reply:
               help: Reply to the message
               arguments:
@@ -54,15 +130,6 @@ actions:
                   in: requestBody
                   required: true
                   help: Text of the message to send.
-                channel:
-                  type: string
-                  in: requestBody
-                  required: true
-                  help: Channel, private group, or IM channel to send message to.
-                thread_ts:
-                  type: string
-                  in: requestBody
-                  help: Provide another message's `ts` value to make this message a reply. Avoid using a reply's `ts` value; use its parent instead.
               http:
                 contentType: application/json
                 port: 5000
@@ -85,7 +152,7 @@ actions:
         output:
           <<: *output
 
-  list_channels:
+  channels:
     help: Get a list of channels
     http:
       port: 5000

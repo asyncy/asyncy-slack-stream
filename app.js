@@ -14,10 +14,16 @@ const Listeners = {};
 function skip(message){
   // From bot
   if (message.subtype && message.subtype === 'bot_message') return true;
-  // juse mentioning there was a reply in a thread
-  if (message.subtype && message.subtype === 'message_replied') return true;
+  // there was a reply in a thread
+  // if (message.subtype && message.subtype === 'message_replied') return true;
   // From me
   if (!message.subtype && message.user === rtm.activeUserId) return true;
+}
+
+function findChannelId(channel, next, err){
+  // TODO cache this
+
+  err();
 }
 
 rtm.on('message', (message) => {
@@ -34,7 +40,7 @@ rtm.on('message', (message) => {
     if (
       (listener.direct === isDirect) &&
       (!listener.channel || listener.channel === message.channel) &&
-      (!listener.filter || message.text.match(listener.filter) !== null)
+      (!listener.pattern || message.text.match(listener.pattern) !== null)
     ){
       // [TODO] add metric for receiving this event
       const url = listener.endpoint || process.env.OMG_ENDPOINT;
@@ -66,10 +72,14 @@ http.createServer((req, res) => {
   req.on('end', () => {
     var data = (body ? JSON.parse(body) : {})
     if (req.url == '/subscribe') {
-      // [TODO] log new listener
       console.log('New subscribe '+body);
       web.channels.list().then((result) => {
-        let channel = result.ok && result.channels.find(c => c.name === data.data.channel)
+        let channel = (
+          result.ok &&
+          result.channels.find(c => {
+            return c.name === data.data.channel || c.id === data.data.channel
+          })
+        );
         if (channel) {
           Listeners[data.id] = {
             id: data.id,
@@ -80,11 +90,8 @@ http.createServer((req, res) => {
           };
           res.writeHead(204);
           res.end();
-        } else {
-          res.writeHead(404);
-          res.end();
         }
-      })
+      });
     } else if (req.url == '/unsubscribe') {
       // [TODO] log new listener
       console.log('New unsubscribe');
@@ -94,18 +101,30 @@ http.createServer((req, res) => {
       res.end();
 
     } else if (req.url == '/send') {
-      // Send a message
-      web.chat.postMessage(data)
-        .then((r) => {
-          console.log('Message sent: ', r.ts);
-          res.writeHead(204);
-          res.end();
-        })
-        .catch((err) => {
-          console.error(err);
-          res.writeHead(500);
-          res.end(err);
-        });
+      web.channels.list().then((result) => {
+        let channel = (
+          result.ok && result.channels.find(c => {
+            return c.name === data.to || c.id === data.to
+          })
+        );
+        if (channel) {
+          web.chat.postMessage({
+            channel: channel.id,
+            text: data.text
+          })
+          .then((r) => {
+            console.log('Message sent: ', r.ts);
+            res.writeHead(200);
+            res.write(JSON.stringify(r));
+            res.end();
+          })
+          .catch((err) => {
+            console.error(err);
+            res.writeHead(500);
+            res.end(err);
+          });
+        }
+      });
 
     } else if (req.url == '/channels') {
       const param = {

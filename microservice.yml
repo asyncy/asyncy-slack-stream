@@ -121,20 +121,20 @@ actions:
             ts:
               help: The message timestamp (eg: "1535474523.000100")
               type: string
-          actions:
-            reply:
-              help: Reply to the message
-              arguments:
-                text:
-                  type: string
-                  in: requestBody
-                  required: true
-                  help: Text of the message to send.
-              http:
-                contentType: application/json
-                port: 5000
-                method: post
-                path: /send
+          # actions:
+          #   reply:
+          #     help: Reply to the message
+          #     arguments:
+          #       text:
+          #         type: string
+          #         in: requestBody
+          #         required: true
+          #         help: Text of the message to send.
+          #     http:
+          #       contentType: application/json
+          #       port: 5000
+          #       method: post
+          #       path: /send
 
       responds:
         help: Triggered by direct messages to the bot

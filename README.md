@@ -13,13 +13,13 @@ omg exec -e TOKEN=<secret> -c bot
 
 Subscribe to an event.
 ```sh
-omg subscribe -e hears -a "pattern=/^hello/"
+omg subscribe bot hears -a "pattern=/^hello/"
 ```
 
 
 ## [Asyncy](https://asyncy.com) Example
 
-The `slack` service is published in the [Asyncy Hub](https://hub.asyncy.com/r/microservice/slack)
+The `slack` service is published in the [Asyncy Hub](https://hub.asyncy.com/service/slack)
 
 ```storyscript
 slack bot as client
@@ -34,4 +34,6 @@ slack bot as client
     when client slash pattern:/deploy/ as msg
         # when user does /deploy do something awesome
 
+# send a post
+slack send text:'Hello world!' to:'general'
 ```

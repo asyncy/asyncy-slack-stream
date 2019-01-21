@@ -4,7 +4,7 @@ lifecycle:
     command: ["node", "app.js"]
 
 actions:
-  say:
+  send:
     help: |
       Post a message in a channel or thread.
       http://slackapi.github.io/node-slack-sdk/web_api#posting-a-message

@@ -20,6 +20,7 @@ function skip(message){
   if (!message.subtype && message.user === rtm.activeUserId) return true;
 }
 
+// https://api.slack.com/rtm
 rtm.on('message', (message) => {
   console.debug('Received message', message);
 
@@ -144,10 +145,9 @@ http.createServer((req, res) => {
 
     } else if (req.url == '/channels') {
       const param = {
-        exclude_archived: true,
-        types: 'public_channel',
-        // Only get first 100 items
-        limit: 100
+        exclude_archived: data.exclude_archived,
+        types: (data.types ? data.types.join(',') : 'public_channel'),
+        limit: data.limit || 100
       };
       web.conversations.list(param).then(results => {
         res.setHeader('Content-Type', 'application/json');

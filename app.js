@@ -20,12 +20,6 @@ function skip(message){
   if (!message.subtype && message.user === rtm.activeUserId) return true;
 }
 
-function findChannelId(channel, next, err){
-  // TODO cache this
-
-  err();
-}
-
 rtm.on('message', (message) => {
   console.debug('Received message', message);
 
@@ -73,25 +67,42 @@ http.createServer((req, res) => {
     var data = (body ? JSON.parse(body) : {})
     if (req.url == '/subscribe') {
       console.log('New subscribe '+body);
-      web.channels.list().then((result) => {
-        let channel = (
-          result.ok &&
-          result.channels.find(c => {
-            return c.name === data.data.channel || c.id === data.data.channel
-          })
-        );
-        if (channel) {
-          Listeners[data.id] = {
-            id: data.id,
-            direct: (data.event === 'responds'),
-            endpoint: data.endpoint,
-            channel: channel.id,
-            pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
-          };
-          res.writeHead(204);
-          res.end();
-        }
-      });
+      if (data.data.channel) {
+        web.channels.list().then((result) => {
+          let channel = (
+            result.ok &&
+            result.channels.find(c => {
+              return c.name === data.data.channel || c.id === data.data.channel
+            })
+          );
+          if (channel) {
+            Listeners[data.id] = {
+              id: data.id,
+              direct: (data.event === 'responds'),
+              endpoint: data.endpoint,
+              channel: channel.id,
+              pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
+            };
+            res.writeHead(204);
+            res.end();
+          } else {
+            res.writeHead(400);
+            res.write('Channel not found.');
+            res.end();
+          }
+        });
+      } else {
+        // listen on all channels
+        Listeners[data.id] = {
+          id: data.id,
+          direct: (data.event === 'responds'),
+          endpoint: data.endpoint,
+          channel: null,
+          pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
+        };
+        res.writeHead(204);
+        res.end();
+      }
     } else if (req.url == '/unsubscribe') {
       // [TODO] log new listener
       console.log('New unsubscribe');
@@ -115,6 +126,7 @@ http.createServer((req, res) => {
           .then((r) => {
             console.log('Message sent: ', r.ts);
             res.writeHead(200);
+            request.setHeader('content-type', 'application/json');
             res.write(JSON.stringify(r));
             res.end();
           })
@@ -123,6 +135,10 @@ http.createServer((req, res) => {
             res.writeHead(500);
             res.end(err);
           });
+        } else {
+          res.writeHead(400);
+          res.write('Channel or destination not found.');
+          res.end();
         }
       });
 

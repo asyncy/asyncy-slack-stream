@@ -126,7 +126,7 @@ http.createServer((req, res) => {
           .then((r) => {
             console.log('Message sent: ', r.ts);
             res.writeHead(200);
-            request.setHeader('content-type', 'application/json');
+            res.setHeader('Content-Type', 'application/json');
             res.write(JSON.stringify(r));
             res.end();
           })

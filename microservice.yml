@@ -101,7 +101,7 @@ actions:
             contentType: application/json
           unsubscribe:
             path: /unsubscribe
-            method: delete
+            method: post
         output: &output
           contentType: application/json
           type: object

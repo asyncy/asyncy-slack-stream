@@ -20,6 +20,53 @@ function skip(message){
   if (!message.subtype && message.user === rtm.activeUserId) return true;
 }
 
+var channelCache = {};
+
+function findChannel(channel, callback){
+  if (channel){
+    if (channelCache[channel]) {
+      callback(channelCache[channel]);
+
+    } else if (channel[0] === '#') {
+      web.channels.list().then((result) => {
+        let c = (
+          result.ok &&
+          result.channels.find(c => {
+            return c.name === channel.substr(1)
+          })
+        );
+        if (c) {
+          channelCache[channel] = c.id;
+          callback(c.id);
+        } else {
+          callback(c.id);
+        }
+      });
+
+    } else if (channel[0] === '@') {
+      web.users.list().then((result) => {
+        let c = (
+          result.ok &&
+          result.members.find(c => {
+            return c.name === channel.substr(1)
+          })
+        );
+        if (c) {
+          channelCache[channel] = c.id;
+          callback(c.id);
+        } else {
+          callback(c.id);
+        }
+      });
+
+    } else {
+      callback(channel);
+    }
+  } else {
+      callback();
+  }
+}
+
 // https://api.slack.com/rtm
 rtm.on('message', (message) => {
   console.debug('Received message', message);
@@ -68,42 +115,26 @@ http.createServer((req, res) => {
     var data = (body ? JSON.parse(body) : {})
     if (req.url == '/subscribe') {
       console.log('New subscribe '+body);
-      if (data.data.channel) {
-        web.channels.list().then((result) => {
-          let channel = (
-            result.ok &&
-            result.channels.find(c => {
-              return c.name === data.data.channel || c.id === data.data.channel
-            })
-          );
-          if (channel) {
-            Listeners[data.id] = {
-              id: data.id,
-              direct: (data.event === 'responds'),
-              endpoint: data.endpoint,
-              channel: channel.id,
-              pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
-            };
-            res.writeHead(204);
-            res.end();
-          } else {
-            res.writeHead(400);
-            res.write('Channel not found.');
-            res.end();
-          }
-        });
-      } else {
-        // listen on all channels
+
+      findChannel(data.data.channel, (channel) => {
+        console.log('sub to', channel);
+        if (data.data.channel && !channel) {
+          res.writeHead(400);
+          res.write('Channel not found.');
+          res.end();
+          return
+        }
         Listeners[data.id] = {
           id: data.id,
           direct: (data.event === 'responds'),
           endpoint: data.endpoint,
-          channel: null,
+          channel: channel.id,
           pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
         };
         res.writeHead(204);
         res.end();
-      }
+      });
+
     } else if (req.url == '/unsubscribe') {
       // [TODO] log new listener
       console.log('New unsubscribe');
@@ -113,15 +144,11 @@ http.createServer((req, res) => {
       res.end();
 
     } else if (req.url == '/send') {
-      web.channels.list().then((result) => {
-        let channel = (
-          result.ok && result.channels.find(c => {
-            return c.name === data.to || c.id === data.to
-          })
-        );
+      // if # then look it up. else use the channel id
+      findChannel(data.to, (channel) => {
         if (channel) {
           web.chat.postMessage({
-            channel: channel.id,
+            channel: channel,
             text: data.text
           })
           .then((r) => {

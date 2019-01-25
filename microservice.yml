@@ -17,7 +17,9 @@ actions:
       to:
         type: string
         in: requestBody
-        help: What channel or thread to send message in.
+        help: |
+          What channel to send message in.
+          This can be a "#channel" "@user" or a channel id.
       attachments:
         type: list
         in: requestBody

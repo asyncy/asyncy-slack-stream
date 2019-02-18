@@ -69,16 +69,16 @@ function findChannel(channel, callback){
 
 // https://api.slack.com/rtm
 rtm.on('message', (message) => {
-  console.debug('Received message', message);
+  console.debug('Received', message);
 
   if (skip(message)) return;
 
-  var direct = new RegExp(`^<@${rtm.activeUserId}>`);
+  var directRegexp = new RegExp(`^<@${rtm.activeUserId}>`);
 
   // loop through all our listeners
   Object.keys(Listeners).forEach((id) => {
     var listener = Listeners[id];
-    var isDirect = (message.text.match(direct) !== null);
+    var isDirect = (message.text.match(directRegexp) !== null);
     if (
       (listener.direct === isDirect) &&
       (!listener.channel || listener.channel === message.channel) &&
@@ -86,7 +86,7 @@ rtm.on('message', (message) => {
     ){
       // [TODO] add metric for receiving this event
       const url = listener.endpoint || process.env.OMG_ENDPOINT;
-      console.log('Publishing to ' + listener.id + ' @ ' + url);
+      console.debug('Publish', listener);
       let body = JSON.stringify({
         eventType: ((isDirect) ? 'responds' : 'hears'),
         cloudEventsVersion: '0.1',
@@ -114,7 +114,7 @@ http.createServer((req, res) => {
   req.on('end', () => {
     var data = (body ? JSON.parse(body) : {})
     if (req.url == '/subscribe') {
-      console.log('New subscribe '+body);
+      console.debug('Subscribe', body, data);
 
       findChannel(data.data.channel, (channel) => {
         console.log('sub to', channel);
@@ -137,7 +137,7 @@ http.createServer((req, res) => {
 
     } else if (req.url == '/unsubscribe') {
       // [TODO] log new listener
-      console.log('New unsubscribe');
+      console.debug('Unsubscribe', body, data);
 
       delete Listeners[data.id];
       res.writeHead(204);

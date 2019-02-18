@@ -170,6 +170,13 @@ http.createServer((req, res) => {
         }
       });
 
+    } else if (req.url == '/listUsers') {
+      web.users.list(data).then(results => {
+        res.setHeader('Content-Type', 'application/json');
+        res.write(JSON.stringify(results));
+        res.end();
+      });
+
     } else if (req.url == '/channels') {
       const param = {
         exclude_archived: data.exclude_archived,

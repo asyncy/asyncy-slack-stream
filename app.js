@@ -128,7 +128,7 @@ http.createServer((req, res) => {
           id: data.id,
           direct: (data.event === 'responds'),
           endpoint: data.endpoint,
-          channel: channel.id,
+          channel: channel,
           pattern: (data.data.pattern ? new RegExp(data.data.pattern) : null),
         };
         res.writeHead(204);

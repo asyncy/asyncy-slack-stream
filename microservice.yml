@@ -141,11 +141,14 @@ actions:
       responds:
         help: Triggered by direct messages to the bot
         http:
+          port: 5000
           subscribe:
             contentType: application/json
-            port: 5000
             method: post
             path: /subscribe
+          unsubscribe:
+            path: /unsubscribe
+            method: post
         arguments:
           pattern:
             type: string

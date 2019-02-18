@@ -95,7 +95,7 @@ actions:
             in: requestBody
             required: true
             help: Only listen in a specific channel
-        http:
+        http: &pubsub
           port: 5000
           subscribe:
             method: post
@@ -124,32 +124,11 @@ actions:
             ts:
               help: The message timestamp (eg: "1535474523.000100")
               type: string
-          # actions:
-          #   reply:
-          #     help: Reply to the message
-          #     arguments:
-          #       text:
-          #         type: string
-          #         in: requestBody
-          #         required: true
-          #         help: Text of the message to send.
-          #     http:
-          #       contentType: application/json
-          #       port: 5000
-          #       method: post
-          #       path: /send
 
       responds:
         help: Triggered by direct messages to the bot
         http:
-          port: 5000
-          subscribe:
-            contentType: application/json
-            method: post
-            path: /subscribe
-          unsubscribe:
-            path: /unsubscribe
-            method: post
+          <<: *pubsub
         arguments:
           pattern:
             type: string
@@ -158,7 +137,7 @@ actions:
         output:
           <<: *output
 
-  listUsers:
+  users:
     http:
       port: 5000
       method: post
@@ -189,6 +168,7 @@ actions:
         help: |
           Paginate through collections of data by setting the cursor parameter to a next_cursor attribute returned by a previous request's response_metadata. Default value fetches the first "page" of the collection. See pagination for more detail.
     output:
+      # TODO add action:next, property:has_more
       contentType: application/json
       type: map
 

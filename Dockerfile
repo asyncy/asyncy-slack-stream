@@ -1,7 +1,8 @@
-FROM node:9.7-alpine
+FROM        python:3.7-alpine
 
-RUN npm install @slack/client request
+RUN         mkdir /app
+COPY        app/ /app/
+ADD         requirements.txt /app
+RUN         pip install -r /app/requirements.txt
 
-ADD app.js app.js
-
-ENTRYPOINT ["node", "app.js"]
+ENTRYPOINT  ["python", "/app/main.py"]

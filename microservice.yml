@@ -1,84 +1,43 @@
 omg: 1
 lifecycle:
   startup:
-    command: ["node", "app.js"]
+    command: ["python", "app/main.py"]
 
 actions:
   send:
     help: |
-      Post a message in a channel or thread.
-      http://slackapi.github.io/node-slack-sdk/web_api#posting-a-message
+      Sends a message to a channel.
+      https://api.slack.com/methods/chat.postMessage
     arguments:
       text:
         type: string
         in: requestBody
         required: true
         help: Text of the message to send.
-      to:
+      channel:
         type: string
         in: requestBody
+        required: true
         help: |
           What channel to send message in.
           This can be a "#channel" "@user" or a channel id.
       attachments:
         type: list
         in: requestBody
-        # items:
-        #   type: map
-        #   attributes:
-        #     fallback:
-        #       help: Required plain-text summary of the attachment.
-        #       type: string
-        #     color:
-        #       type: string
-        #       pattern: '^#\\w{6}'
-        #     author_name:
-        #       type: string
-        #     author_link:
-        #       type: string
-        #       pattern: '^http'
-        #     author_icon:
-        #       type: string
-        #       pattern: '^http'
-        #     title:
-        #       type: string
-        #     title_link:
-        #       type: string
-        #       pattern: '^http'
-        #     text:
-        #       type: string
-        #       help: Optional text that appears within the attachment
-        #     fields:
-        #       type: list
-        #       items:
-        #         type: map
-        #         properties:
-        #           title:
-        #             type: string
-        #           value:
-        #             type: string
-        #           short:
-        #             type: boolean
-        #     image_url:
-        #       type: string
-        #       pattern: '^http'
-        #     thumb_url:
-        #       type: string
-        #       pattern: '^http'
-        #     footer:
-        #       type: string
-        #     footer_icon:
-        #       type: string
-        #       pattern: '^http'
-        #     ts:
-        #       type: int
+      token: &token
+        in: requestBody
+        type: string
+        help: |
+          Authentication token bearing required scopes.
+          Environment variable BOT_TOKEN used by default.
     output:
-      type: map
-    http:
       contentType: application/json
-      port: 5000
+      type: map
+    http: &http
+      path: /api/chat.PostMessage
       method: post
-      path: /send
+      port: 5000
+      contentType: application/json
 
   bot:
     help: Start a Slack bot
@@ -139,16 +98,11 @@ actions:
 
   users:
     http:
-      port: 5000
-      method: post
-      path: /listUsers
+      <<: *http
+      path: /api/users.list
     arguments:
       token:
-        in: requestBody
-        type: string
-        help: |
-          Authentication token bearing required scopes.
-          Environment variable BOT_TOKEN used by default.
+        <<: *token
       include_locale:
         help: |
           Set this to true to receive the locale for users. Defaults to false
@@ -175,11 +129,12 @@ actions:
   channels:
     help: Get a list of channels
     http:
-      port: 5000
-      method: post
-      path: /channels
+      <<: *http
+      path: /api/channels.list
     arguments:
-      limit:
+      token:
+        <<: *token
+      limit: &limit
         type: int
         default: 100
         in: requestBody
@@ -197,16 +152,30 @@ actions:
           Default is public_channel only.
     output:
       contentType: application/json
-      type: list
-      items:
-        type: object
-        properties:
-          id:
-            help: The channel ID
-            type: string
-          name:
-            help: The channel name
-            type: string
+      type: map
+      # items:
+      #   type: object
+      #   properties:
+      #     id:
+      #       help: The channel ID
+      #       type: string
+      #     name:
+      #       help: The channel name
+      #       type: string
+
+  directChannels:
+    help: Lists direct message channels for the calling user.
+    http:
+      <<: *http
+      path: /api/im.list
+    arguments:
+      token:
+        <<: *token
+      limit:
+        <<: *limit
+    output:
+      contentType: application/json
+      type: map
 
 environment:
   BOT_TOKEN:

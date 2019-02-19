@@ -36,7 +36,7 @@ actions:
     http: &http
       path: /api/chat.PostMessage
       method: post
-      port: 5000
+      port: 8000
       contentType: application/json
 
   bot:
@@ -55,7 +55,7 @@ actions:
             required: true
             help: Only listen in a specific channel
         http: &pubsub
-          port: 5000
+          port: 8000
           subscribe:
             method: post
             path: /subscribe

@@ -30,4 +30,5 @@ def find_channel(channel):
                     return channel_cache.setdefault(channel, member['id'])
 
     else:
+        # assued to be a qualified channel id
         return channel

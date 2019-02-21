@@ -34,7 +34,7 @@ actions:
       contentType: application/json
       type: map
     http: &http
-      path: /api/chat.PostMessage
+      path: /api/chat.postMessage
       method: post
       port: 8000
       contentType: application/json

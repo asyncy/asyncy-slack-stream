@@ -8,7 +8,9 @@ from helpers import find_channel
 def prepare(data):
     if data.get('channel'):
         data['channel'] = find_channel(data['channel'])
-    return data
+
+    # Reduce by removing values equal to None
+    return {k: v for k, v in data.items() if v is not None}
 
 
 @server.route('/api/<endpoint>', methods=['POST'])

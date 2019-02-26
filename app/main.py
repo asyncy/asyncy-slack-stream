@@ -13,5 +13,6 @@ if __name__ == '__main__':
             port=int(os.getenv('FLASK_PORT', 8000)),
             debug=(os.getenv('FLASK_DEBUG') == 'TRUE')
         )
+
     except:
         bot.rtm.stop()

@@ -6,7 +6,7 @@ from time import sleep
 import threading
 from json import dumps
 from flask import request
-from app import server, slack
+from app import server, slack, logger
 from helpers import find_channel
 
 Listeners = {}
@@ -23,11 +23,9 @@ def skip(message):
     if not message:
         return True
     elif message.get('type') != 'message':
-        print('e1', message)
         return True
     # From bot
     elif message.get('subtype') == 'bot_message':
-        print('e2')
         return True
     # # there was a reply in a thread
     # elif not message.get('subtype') and message['user'] == rtm.activeUserId:
@@ -42,25 +40,32 @@ def matches_channel(left, right):
     return True 
 
 
-debug = server.logger.debug  # for less dot == faster
+botId = None
 
 
 def received(message):
     if skip(message):
-        debug('Skip message %s', message)
+        logger.debug('Skip message %s', message)
         return
+
+    global botId
+    if botId is None:
+        botId = f'<@{slack.server.users.find(slack.server.username).id}>'
     
-    is_direct = False # message['text']
+    is_direct = message['text'].startswith(botId)
+    if is_direct:
+        # remove the <@BOTID> from the message
+        message['text'] = message['text'].replace(botId, '', 1).strip()
     
     for id, listener in Listeners.items():
         if is_direct and not listener['direct']:
-            debug('Not a direct message %s', message)
+            logger.debug('Not a direct message %s', message)
             continue
         elif not matches_channel(listener['channel'], message['channel']):
-            debug('Not listening to this channel %s', message)
+            logger.debug('Not listening to this channel %s', message)
             continue
         elif not listener['pattern'](message['text']):
-            debug('Message text does not match pattern %s', message)
+            logger.debug('Message text does not match pattern %s', message)
             continue
         
         requests.post(
@@ -80,24 +85,24 @@ class SlackRTM(threading.Thread):
     stopped = True
 
     def start(self):
-        server.logger.info('SlackRTM Starting')
+        logger.info('SlackRTM Starting')
         self.stopped = False
         super(SlackRTM, self).start()
 
     def stop(self):
-        server.logger.info('SlackRTM Stopping')
+        logger.info('SlackRTM Stopping')
         self.stopped = True
 
     def run(self):
         if self.stopped is False:
             self.stopped = False
             if slack.rtm_connect(auto_reconnect=True):
-                while not self.stopped:
+                while self.stopped is False and slack.server.connected is True:
                     for msg in slack.rtm_read():
                         received(msg)
                     sleep(.2)
             else:
-                server.logger.warn('SlackRTM connectin failed')
+                logger.error('SlackRTM connection failed')
 
 
 rtm = SlackRTM()
@@ -117,7 +122,7 @@ def subscribe():
         'pattern': pattern(body['data'].get('pattern'))
     }
 
-    server.logger.info('New subscription started')
+    logger.info('New subscription started')
 
     rtm.start()
     
@@ -128,7 +133,7 @@ def subscribe():
 def unsubscribe():
     Listeners.pop(request.json['id'], None)
 
-    server.logger.info('Unsubscribing to', request.json['id'])
+    logger.info('Unsubscribing to %s', request.json['id'])
 
     if len(Listeners) == 0:
         rtm.stop()

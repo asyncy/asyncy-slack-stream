@@ -58,8 +58,8 @@ def received(message):
         message['text'] = message['text'].replace(botId, '', 1).strip()
     
     for id, listener in Listeners.items():
-        if is_direct and not listener['direct']:
-            logger.debug('Not a direct message %s', message)
+        if is_direct is not listener['direct']:
+            logger.debug('Skip listener is(nt) direct %s', message)
             continue
         elif not matches_channel(listener['channel'], message['channel']):
             logger.debug('Not listening to this channel %s', message)

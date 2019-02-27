@@ -19,17 +19,26 @@ def pattern(string):
         return bool  # nice hack to always return true
 
 
+def handle_channel_joined(message):
+    # If the bot is invited to a new channel we need to add it to list of listeners manually
+    botid = slack.server.users.find(slack.server.username).id
+    if botid in message['channel']['members']:
+        logger.info('Bot invited to new channel: %s', message['channel']['name'])
+        slack.server.parse_channel_data([message['channel']])
+
+
 def skip(message):
     if not message:
         return True
     elif message.get('type') != 'message':
+        if message.get('type') == 'channel_joined':
+            handle_channel_joined(message)
         return True
     # From bot
     elif message.get('subtype') == 'bot_message':
         return True
     # # there was a reply in a thread
     # elif not message.get('subtype') and message['user'] == rtm.activeUserId:
-    #     print('e3')
     #     return True
     return False
 
@@ -57,7 +66,7 @@ def received(message):
         # remove the <@BOTID> from the message
         message['text'] = message['text'].replace(botId, '', 1).strip()
     
-    for id, listener in Listeners.items():
+    for _id, listener in Listeners.items():
         if is_direct is not listener['direct']:
             logger.debug('Skip listener is(nt) direct %s', message)
             continue
@@ -75,7 +84,7 @@ def received(message):
                 eventType='responds' if is_direct else 'hears',
                 cloudEventsVersion='0.1',
                 contentType='application/vnd.omg.object+json',
-                eventID=message['client_msg_id'],
+                eventID=message.get('client_msg_id') or message.get('event_ts'),
                 data=message
             ))
         )

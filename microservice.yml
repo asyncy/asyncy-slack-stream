@@ -1,4 +1,8 @@
 omg: 1
+info:
+  version: 1.0.1
+  title: Slack Microservice
+  description: This is a microservice for Slack
 lifecycle:
   startup:
     command: ["python", "app/main.py"]

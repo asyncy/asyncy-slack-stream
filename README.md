@@ -1,23 +1,70 @@
-# Slack as a microservice
+# _Slack_ OMG Microservice
 
-[![Open Microservice Guide](https://img.shields.io/badge/OMG-enabled-brightgreen.svg?style=for-the-badge)](https://microservice.guide)
+[![Open Microservice Guide](https://img.shields.io/badge/OMG%20Enabled-👍-green.svg?)](https://microservice.guide)
 
 This microservice's goal is to fully utilise the Slack API.
 
-## [OMG](hhttps://microservice.guide) CLI
+## Direct usage in [Storyscript](https://storyscript.io/):
 
-### Slack Bot
-```sh
-omg exec -e TOKEN=<secret> -c bot
+##### Send
+```coffee
+>>> slack send text:'messageText' channel:'channelName' attachments:'attachmentsList' token:'token'
+```
+##### Responds
+```coffee
+>>> slack responds pattern:'pattern'
+```
+##### Users
+```coffee
+>>> slack users token:'token' limit:'limit' cursor:'cursor'
+```
+##### Channels
+```coffee
+>>> slack channels token:'token' limit:'limit' types:'listOfTypes'
+```
+##### Direct Channels
+```coffee
+>>> slack directChannels token:'token' limit:'limit'
 ```
 
-Subscribe to an event.
-```sh
-omg subscribe bot hears -a "pattern=/^hello/"
+Curious to [learn more](https://docs.storyscript.io/)?
+
+✨🍰✨
+
+## Usage with [OMG CLI](https://www.npmjs.com/package/omg)
+
+##### Send
+```shell
+$ omg run send -a text=<MESSAGE_TEXT> -a channel=<ID/NAME> -a attachments=<ATTACHMENT_LIST> -a token=<TOKEN> -e BOT_TOKEN=<BOT_TOKEN>
+```
+##### Responds
+```shell
+$ omg run responds -a pattern=<PATTERN> -e BOT_TOKEN=<BOT_TOKEN>
+```
+##### Users
+```shell
+$ omg run users -a token=<TOKEN> -a limit=<LIMIT> -a cursor=<CURSOR> -e BOT_TOKEN=<BOT_TOKEN>
+```
+##### Channels
+```shell
+$ omg run channels -a token=<TOKEN> -a limit=<LIMIT> -a types=<LIST_OF_TYPES> -e BOT_TOKEN=<BOT_TOKEN>
+```
+##### Direct Channels
+```shell
+$ omg run directChannels -a token=<TOKEN> -a limit=<LIMIT> -e BOT_TOKEN=<BOT_TOKEN>
+```
+##### Bot
+```shell
+$ omg subscribe bot hears -a pattern=<PATTERN> -a channel=<ID/NAME> -e BOT_TOKEN=<BOT_TOKEN>
 ```
 
+**Note**: The OMG CLI requires [Docker](https://docs.docker.com/install/) to be installed.
 
-## [Asyncy](https://asyncy.com) Example
+## License
+[MIT License](https://github.com/omg-services/slack/blob/master/LICENSE).
+
+
+<!-- ## [Asyncy](https://asyncy.com) Example
 
 The `slack` service is published in the [Asyncy Hub](https://hub.asyncy.com/service/slack)
 
@@ -36,4 +83,4 @@ slack bot as client
 
 # send a post
 slack send text:'Hello world!' to:'general'
-```
+``` -->

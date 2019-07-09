@@ -91,7 +91,7 @@ actions:
   responds:
     help: Triggered by direct messages to the bot
     http:
-      <<: *pubsub
+      <<: *http
     arguments:
       pattern:
         type: string

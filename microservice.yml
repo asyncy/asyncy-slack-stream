@@ -88,17 +88,17 @@ actions:
               help: The message timestamp (eg: "1535474523.000100")
               type: string
 
-      responds:
-        help: Triggered by direct messages to the bot
-        http:
-          <<: *pubsub
-        arguments:
-          pattern:
-            type: string
-            in: requestBody
-            help: A regexp pattern to filter messages
-        output:
-          <<: *output
+  responds:
+    help: Triggered by direct messages to the bot
+    http:
+      <<: *http
+    arguments:
+      pattern:
+        type: string
+        in: requestBody
+        help: A regexp pattern to filter messages
+    output:
+      <<: *output
 
   users:
     http:

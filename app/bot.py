@@ -138,6 +138,14 @@ def subscribe():
     return 'Subscribed'
 
 
+@server.route('/health', methods=['GET'])
+def health():
+    return dumps(dict(
+            contentType='application/json',
+            data="ok",
+            status=200
+        ))
+
 @server.route('/unsubscribe', methods=['POST'])
 def unsubscribe():
     Listeners.pop(request.json['id'], None)

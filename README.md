@@ -12,7 +12,7 @@ This microservice's goal is to fully utilise the Slack API.
 ```
 ##### Responds
 ```coffee
->>> slack responds pattern:'pattern'
+>>> slack bot responds pattern:'pattern'
 ```
 ##### Users
 ```coffee
@@ -39,7 +39,7 @@ $ omg run send -a text=<MESSAGE_TEXT> -a channel=<ID/NAME> -a attachments=<ATTAC
 ```
 ##### Responds
 ```shell
-$ omg run responds -a pattern=<PATTERN> -e BOT_TOKEN=<BOT_TOKEN>
+$ omg subscribe bot responds -a pattern=<PATTERN> -e BOT_TOKEN=<BOT_TOKEN>
 ```
 ##### Users
 ```shell

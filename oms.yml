@@ -5,7 +5,7 @@ info:
   description: This is a microservice for Slack
 lifecycle:
   startup:
-    command: ["python", "app/main.py"]
+    command: ['python', 'app/main.py']
 
 actions:
   send:
@@ -85,7 +85,7 @@ actions:
               help: The user ID
               type: string
             ts:
-              help: The message timestamp (eg: "1535474523.000100")
+              help: 'The message timestamp (eg: "1535474523.000100")'
               type: string
 
   responds:

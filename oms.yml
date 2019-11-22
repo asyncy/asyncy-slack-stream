@@ -1,4 +1,4 @@
-omg: 1
+oms: 1
 info:
   version: 0.2.0
   title: Slack Microservice
@@ -6,7 +6,10 @@ info:
 lifecycle:
   startup:
     command: ['python', 'app/main.py']
-
+health:
+  http:
+    path: /health
+    port: 8000
 actions:
   send:
     help: |
@@ -68,6 +71,15 @@ actions:
             path: /unsubscribe
             method: post
             contentType: application/json
+      responds:
+        help: Triggered by direct messages to the bot
+        http:
+          <<: *pubsub
+        arguments:
+          pattern:
+            type: string
+            in: requestBody
+            help: A regexp pattern to filter messages
         output: &output
           contentType: application/json
           type: object
@@ -88,17 +100,6 @@ actions:
               help: 'The message timestamp (eg: "1535474523.000100")'
               type: string
 
-  responds:
-    help: Triggered by direct messages to the bot
-    http:
-      <<: *http
-    arguments:
-      pattern:
-        type: string
-        in: requestBody
-        help: A regexp pattern to filter messages
-    output:
-      <<: *output
 
   users:
     http:

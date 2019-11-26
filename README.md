@@ -1,6 +1,6 @@
-# _Slack Microservice_ Open Microservice
+# _Slack_ Open Microservice
 
-> This is a microservice for Slack
+> This is a wrapper for the Slack API
 
 [![Open Microservice Specification Version](https://img.shields.io/badge/Open%20Microservice-1.0-477bf3.svg)](https://openmicroservices.org) [![Open Microservices Spectrum Chat](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/open-microservices) [![Open Microservices Code of Conduct](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](https://github.com/oms-services/.github/blob/master/CODE_OF_CONDUCT.md) [![Open Microservices Commitzen](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
@@ -69,8 +69,7 @@ oms subscribe hears \
     -a channel='*****' \ 
     -e BOT_TOKEN=$BOT_TOKEN
 ```
-
-##### responds
+,##### responds
 
 > Triggered by direct messages to the bot
 ##### Action Arguments
@@ -81,7 +80,7 @@ oms subscribe hears \
 | BOT_TOKEN | `string` | `false` | None | The Slack bot token |
 
 ``` shell
-oms run responds \ 
+oms subscribe responds \ 
     -a pattern='*****' \ 
     -e BOT_TOKEN=$BOT_TOKEN
 ```

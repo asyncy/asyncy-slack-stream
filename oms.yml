@@ -1,8 +1,8 @@
 oms: 1
 info:
   version: 0.2.0
-  title: Slack Microservice
-  description: This is a microservice for Slack
+  title: Slack
+  description: This is a wrapper for the Slack API
 lifecycle:
   startup:
     command: ['python', 'app/main.py']
@@ -99,7 +99,6 @@ actions:
             ts:
               help: 'The message timestamp (eg: "1535474523.000100")'
               type: string
-
 
   users:
     http:

@@ -3,9 +3,15 @@ info:
   version: 0.2.0
   title: Slack
   description: This is a wrapper for the Slack API
+  contact:
+    name: Open Microservices
+    url: 'https://openmicroservices.org'
+    email: core@openmicroservices.org
 lifecycle:
   startup:
-    command: ['python', 'app/main.py']
+    command:
+      - python
+      - app/main.py
 health:
   http:
     path: /health
@@ -31,7 +37,7 @@ actions:
       attachments:
         type: list
         in: requestBody
-      token: &token
+      token:
         in: requestBody
         type: string
         help: |
@@ -40,12 +46,11 @@ actions:
     output:
       contentType: application/json
       type: map
-    http: &http
+    http:
       path: /api/chat.postMessage
       method: post
       port: 8000
       contentType: application/json
-
   bot:
     help: Start a Slack bot
     events:
@@ -61,26 +66,28 @@ actions:
             in: requestBody
             required: true
             help: Only listen in a specific channel
-        http: &pubsub
+        http:
           port: 8000
-          subscribe:
+          subscribe: &ref_0
             method: post
             path: /subscribe
             contentType: application/json
-          unsubscribe:
+          unsubscribe: &ref_1
             path: /unsubscribe
             method: post
             contentType: application/json
       responds:
         help: Triggered by direct messages to the bot
         http:
-          <<: *pubsub
+          port: 8000
+          subscribe: *ref_0
+          unsubscribe: *ref_1
         arguments:
           pattern:
             type: string
             in: requestBody
             help: A regexp pattern to filter messages
-        output: &output
+        output:
           contentType: application/json
           type: object
           properties:
@@ -99,14 +106,19 @@ actions:
             ts:
               help: 'The message timestamp (eg: "1535474523.000100")'
               type: string
-
   users:
     http:
-      <<: *http
       path: /api/users.list
+      method: post
+      port: 8000
+      contentType: application/json
     arguments:
       token:
-        <<: *token
+        in: requestBody
+        type: string
+        help: |
+          Authentication token bearing required scopes.
+          Environment variable BOT_TOKEN used by default.
       include_locale:
         help: |
           Set this to true to receive the locale for users. Defaults to false
@@ -116,29 +128,38 @@ actions:
         in: requestBody
         type: int
         default: 0
-        help: |
-          The maximum number of items to return. Fewer than the requested number of items may be returned, even if the end of the users list hasn't been reached.
+        help: >
+          The maximum number of items to return. Fewer than the requested number
+          of items may be returned, even if the end of the users list hasn't
+          been reached.
         range:
           min: 0
       cursor:
         in: requestBody
         type: string
-        help: |
-          Paginate through collections of data by setting the cursor parameter to a next_cursor attribute returned by a previous request's response_metadata. Default value fetches the first "page" of the collection. See pagination for more detail.
+        help: >
+          Paginate through collections of data by setting the cursor parameter
+          to a next_cursor attribute returned by a previous request's
+          response_metadata. Default value fetches the first "page" of the
+          collection. See pagination for more detail.
     output:
-      # TODO add action:next, property:has_more
       contentType: application/json
       type: map
-
   channels:
     help: Get a list of channels
     http:
-      <<: *http
       path: /api/channels.list
+      method: post
+      port: 8000
+      contentType: application/json
     arguments:
       token:
-        <<: *token
-      limit: &limit
+        in: requestBody
+        type: string
+        help: |
+          Authentication token bearing required scopes.
+          Environment variable BOT_TOKEN used by default.
+      limit:
         type: int
         default: 100
         in: requestBody
@@ -157,30 +178,28 @@ actions:
     output:
       contentType: application/json
       type: map
-      # items:
-      #   type: object
-      #   properties:
-      #     id:
-      #       help: The channel ID
-      #       type: string
-      #     name:
-      #       help: The channel name
-      #       type: string
-
   directChannels:
     help: Lists direct message channels for the calling user.
     http:
-      <<: *http
       path: /api/im.list
+      method: post
+      port: 8000
+      contentType: application/json
     arguments:
       token:
-        <<: *token
+        in: requestBody
+        type: string
+        help: |
+          Authentication token bearing required scopes.
+          Environment variable BOT_TOKEN used by default.
       limit:
-        <<: *limit
+        type: int
+        default: 100
+        in: requestBody
+        help: Limit the number of channels to return. Must be less than 1000.
     output:
       contentType: application/json
       type: map
-
 environment:
   BOT_TOKEN:
     type: string

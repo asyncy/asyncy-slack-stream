@@ -2,10 +2,16 @@ oms: 1
 info:
   version: 0.2.0
   title: Slack
-  description: This is a wrapper for the Slack API
+  description: Wrapper for the Slack API
+  contact:
+    name: Open Microservices
+    url: 'https://openmicroservices.org'
+    email: core@openmicroservices.org
 lifecycle:
   startup:
-    command: ['python', 'app/main.py']
+    command:
+      - python
+      - app/main.py
 health:
   http:
     path: /health
@@ -45,7 +51,6 @@ actions:
       method: post
       port: 8000
       contentType: application/json
-
   bot:
     help: Start a Slack bot
     events:
@@ -99,7 +104,6 @@ actions:
             ts:
               help: 'The message timestamp (eg: "1535474523.000100")'
               type: string
-
   users:
     http:
       <<: *http
@@ -129,7 +133,6 @@ actions:
       # TODO add action:next, property:has_more
       contentType: application/json
       type: map
-
   channels:
     help: Get a list of channels
     http:
@@ -157,16 +160,6 @@ actions:
     output:
       contentType: application/json
       type: map
-      # items:
-      #   type: object
-      #   properties:
-      #     id:
-      #       help: The channel ID
-      #       type: string
-      #     name:
-      #       help: The channel name
-      #       type: string
-
   directChannels:
     help: Lists direct message channels for the calling user.
     http:
@@ -180,7 +173,6 @@ actions:
     output:
       contentType: application/json
       type: map
-
 environment:
   BOT_TOKEN:
     type: string
